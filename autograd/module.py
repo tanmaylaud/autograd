@@ -12,6 +12,12 @@ class Module:
             elif isinstance(value, Module):
                 yield from value.parameters()
 
+    def __call__(self, *x):
+        return self.forward(*x)
+
+    def forward(self, *x):
+        raise NotImplementedError
+
     def zero_grad(self):
         for parameter in self.parameters():
             parameter.zero_grad()

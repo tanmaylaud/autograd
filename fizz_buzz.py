@@ -10,6 +10,7 @@ import numpy as np
 
 from autograd import Tensor, Parameter, Module
 from autograd.function import tanh
+from autograd.layers import Linear
 from autograd.optim import SGD
 
 def binary_encode(x: int) -> List[int]:
@@ -28,6 +29,8 @@ def fizz_buzz_encode(x: int) -> List[int]:
 x_train = Tensor([binary_encode(x) for x in range(101, 1024)])
 y_train = Tensor([fizz_buzz_encode(x) for x in range(101, 1024)])
 
+print(x_train.shape)
+print(y_train.shape)
 class FizzBuzzModel(Module):
     def __init__(self, num_hidden: int = 50) -> None:
         self.w1 = Parameter(10, num_hidden)
@@ -41,8 +44,23 @@ class FizzBuzzModel(Module):
         x1 = inputs @ self.w1 + self.b1  # (batch_size, num_hidden)
         x2 = tanh(x1)                    # (batch_size, num_hidden)
         x3 = x2 @ self.w2 + self.b2      # (batch_size, 4)
-
+        print(x3.shape)
         return x3
+
+class FizzBuzzModel(Module):
+    def __init__(self, num_hidden: int = 50) -> None:
+        self.linear1 = Linear(10, num_hidden)
+        self.linear2 = Linear(num_hidden, 4)
+
+    def forward(self, x):
+        x1 = self.linear1(inputs)  # (batch_size, num_hidden)
+        x2 = tanh(x1)  # (batch_size, num_hidden)
+        x3 = self.linear2(x2)  # (batch_size, 4)
+        return x3
+
+    def predict(self, x):
+        out = self(x)
+        return out
 
 optimizer = SGD(lr=0.001)
 batch_size = 32
